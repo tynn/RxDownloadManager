@@ -4,8 +4,8 @@ RxDownloadManager
 [![Release][3]][4]
 
 *RxDownloadManager* is an implementation wrapping around the Android
-`DownloadManager` using Rx exposing a `Single` to allow the user to
-react to download completion events and errors.
+`DownloadManager`, using Rx to expose a `Single`. This allows the user 
+to handle download completion and error events.
 
 
 Usage
