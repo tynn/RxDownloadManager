@@ -64,5 +64,5 @@ License
 
   [1]: https://travis-ci.org/volders/RxDownloadManager.svg?branch=master
   [2]: https://travis-ci.org/volders/RxDownloadManager
-  [3]: https://jitpack.io/v/berlin.volders/rxdownloadmanager.svg
-  [4]: https://jitpack.io/#berlin.volders/rxdownloadmanager
+  [3]: https://jitpack.io/v/berlin.volders/rxDownloadManager.svg
+  [4]: https://jitpack.io/#berlin.volders/rxDownloadManager
