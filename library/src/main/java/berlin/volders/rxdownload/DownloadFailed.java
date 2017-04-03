@@ -16,6 +16,11 @@
 
 package berlin.volders.rxdownload;
 
+/**
+ * {@link Exception} thrown in case that when the download is finished there is no
+ * id matching the enqueued download or if the download completed with status
+ * other than {@link android.app.DownloadManager#STATUS_SUCCESSFUL}
+ */
 public class DownloadFailed extends IllegalStateException {
 
     DownloadFailed(String msg) {

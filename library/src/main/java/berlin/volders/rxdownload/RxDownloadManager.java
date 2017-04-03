@@ -29,6 +29,16 @@ import java.lang.ref.WeakReference;
 
 import rx.Single;
 
+/**
+ * A reference to the {@code RxDownloadManager} class has to be initialised by passing {@link Context}.
+ * Then the manager can be directly used by supplying the {@link Uri}, {@link String} file name
+ * and a string resource with a description passed to the {@code download} method.
+ *
+ * <pre>
+ *     rxDownloadManager.download(remoteFileUri, fileName, R.string.description)
+ *                      .subscribe(this::useLocalFileUri, this::handleError);
+ * </pre>
+ */
 public class RxDownloadManager {
 
     private final IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
