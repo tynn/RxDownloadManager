@@ -30,8 +30,8 @@ import java.lang.ref.WeakReference;
 import rx.Single;
 
 /**
- * A reference to the {@code RxDownloadManager} class has to be initialised by passing {@link Context}.
- * Then the manager can be directly used by supplying the {@link Uri}, {@link String} file name
+ * A reference to the {@code RxDownloadManager} has to be initialised by passing {@link Context}.
+ * Then the manager can be directly used by supplying a {@link Uri}, {@link String} file name
  * and a string resource with a description passed to the {@code download} method.
  *
  * <pre>
@@ -65,7 +65,7 @@ public class RxDownloadManager {
      * @param uri         {@link Uri} for downloading the file
      * @param fileName    Destination file name
      * @param description String resource for the text to be shown in the notification associated with the download
-     * @return {@link Single} that upon download completion will emit the {@link Uri} pointing to the local file
+     * @return {@link Single} that, upon download completion, will emit the {@link Uri} pointing to the local file
      */
     public Single<Uri> download(Uri uri, String fileName, @StringRes int description) {
         return download(request(uri, fileName, description));
@@ -73,7 +73,7 @@ public class RxDownloadManager {
 
     /**
      * @param request {@link DownloadManager.Request} that contains the file destination and URL information for downloading
-     * @return {@link Single} that upon download completion will emit the {@link Uri} pointing to the local file
+     * @return {@link Single} that, upon download completion, will emit the {@link Uri} pointing to the local file
      */
     public Single<Uri> download(DownloadManager.Request request) {
         DownloadBroadcastReceiver receiver = new DownloadBroadcastReceiver(dm.enqueue(request));
