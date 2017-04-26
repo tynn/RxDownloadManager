@@ -19,7 +19,7 @@ android:
     - extra-android-m2repository
 
 before_install:
-  - gradle wrapper -b wrapper.gradle
+  - gradle :wrapper --configure-on-demand
 
 script:
   - ./gradlew build check

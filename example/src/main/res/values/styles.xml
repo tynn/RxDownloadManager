@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Button" parent="@style/Widget.AppCompat.Button.Colored">
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_margin">@dimen/spacer_2x</item>
+        <item name="android:paddingEnd">@dimen/spacer_2x</item>
+        <item name="android:paddingLeft">@dimen/spacer_2x</item>
+        <item name="android:paddingRight">@dimen/spacer_2x</item>
+        <item name="android:paddingStart">@dimen/spacer_2x</item>
+    </style>
+
+</resources>

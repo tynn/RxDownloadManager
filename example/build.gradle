@@ -1,0 +1,43 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion xTargetSdkVersion
+    buildToolsVersion xBuildToolsVersion
+
+    defaultConfig {
+        versionCode 1
+        minSdkVersion 17
+        targetSdkVersion xTargetSdkVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+dependencies {
+    compile "com.android.support:appcompat-v7:$supportVersion"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+
+    compile "io.reactivex:rxjava:$rxJavaVersion"
+    compile "io.reactivex:rxandroid:$rxAndroidVersion"
+    compile 'io.reactivex:rxkotlin:1.0.0'
+    compile 'berlin.volders:indicators:0.1.2'
+    compile 'com.github.barteksc:android-pdf-viewer:2.5.1'
+    compile 'com.github.chrisbanes:PhotoView:2.0.0'
+
+    compile project(':library')
+
+    testCompile "junit:junit:4.12"
+}

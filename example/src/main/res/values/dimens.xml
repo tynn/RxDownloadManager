@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="indicator_size">12dp</dimen>
+    <dimen name="spacer_default">10dp</dimen>
+    <dimen name="spacer_2x">20dp</dimen>
+    <dimen name="spacer_4x">40dp</dimen>
+</resources>
