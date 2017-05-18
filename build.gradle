@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:2.3.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
@@ -19,9 +19,9 @@ ext {
     supportVersion = '25.3.1'
     rxJavaVersion = '1.2.9'
     rxAndroidVersion = '1.2.1'
+
     xTargetSdkVersion = 25
     xBuildToolsVersion = '25.0.2'
-
 }
 
 allprojects {

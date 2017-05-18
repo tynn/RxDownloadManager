@@ -24,13 +24,9 @@ import kotlinx.android.synthetic.main.fragment_base.*
 
 class ExternalPdfFragment : PageFragment("rxdm-external.pdf") {
 
-    override fun getStubViewLayout(): Int {
-        return R.layout.fragment_external_pdf
-    }
+    override fun getStubViewLayout() = R.layout.fragment_external_pdf
 
-    override fun getUri(): Uri {
-        return Uri.parse(getString(R.string.pdf_download_url))
-    }
+    override fun getUri() = Uri.parse(getString(R.string.pdf_download_url))
 
     override fun onDownloadCompleted(uri: Uri) {
         progressBar.visibility = View.GONE

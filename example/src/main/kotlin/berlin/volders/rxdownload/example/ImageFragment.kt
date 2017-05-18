@@ -25,33 +25,28 @@ import java.io.File
 
 class ImageFragment : PageFragment("rxdm-image.jpg") {
 
-    private val filePath: String = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path + "/" + fileName
+    val String.isFile get() = File(this).exists()
 
-    override fun getStubViewLayout(): Int {
-        return R.layout.fragment_image
-    }
+    private val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path + "/" + fileName
+
+    override fun getStubViewLayout() = R.layout.fragment_image
 
     override fun onDownloadCompleted(uri: Uri) {
+        button.visibility = View.GONE
         progressBar.visibility = View.GONE
         photoView.setImageURI(uri)
-        button.visibility = View.GONE
+        photoView.background = photoView.drawable.constantState.newDrawable()
     }
 
     override fun onPostStubLoad() {
-        if (isDownloaded()) {
+        if (filePath.isFile) {
             onDownloadCompleted(getUri())
         }
     }
 
-    override fun getUri(): Uri {
-        if (isDownloaded()) {
-            return Uri.fromFile(File(filePath))
-        } else {
-            return Uri.parse(getString(R.string.image_url))
-        }
-    }
-
-    private fun isDownloaded(): Boolean {
-        return File(filePath).exists()
+    override fun getUri() = if (filePath.isFile) {
+        Uri.fromFile(File(filePath))
+    } else {
+        Uri.parse(getString(R.string.image_url))
     }
 }

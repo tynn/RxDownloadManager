@@ -16,23 +16,18 @@
 
 package berlin.volders.rxdownload.example
 
-import android.net.Uri
-import android.view.View
-import kotlinx.android.synthetic.main.fragment_base.*
-import kotlinx.android.synthetic.main.fragment_internal_pdf.*
+import android.content.Context
+import android.support.v4.view.ViewPager
+import android.util.AttributeSet
+import android.view.MotionEvent
 
-class InternalPdfFragment : PageFragment("rxdm-internal.pdf") {
+// For more details follow the link:
+// https://github.com/chrisbanes/PhotoView#issues-with-viewgroups
+class HackyViewPager(context: Context, attrs: AttributeSet) : ViewPager(context, attrs) {
 
-    override fun getStubViewLayout() = R.layout.fragment_internal_pdf
-
-    override fun onDownloadCompleted(uri: Uri) {
-        button.visibility = View.GONE
-        pdfView.fromUri(uri)
-                .onLoad {
-                    textLabel.visibility = View.GONE
-                    progressBar.visibility = View.GONE
-                }.load()
+    override fun onInterceptTouchEvent(ev: MotionEvent) = try {
+        super.onInterceptTouchEvent(ev)
+    } catch (e: IllegalArgumentException) {
+        false
     }
-
-    override fun getUri() = Uri.parse(getString(R.string.pdf_download_url))
 }
