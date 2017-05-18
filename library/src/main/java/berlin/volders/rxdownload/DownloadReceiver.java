@@ -24,24 +24,21 @@ import android.content.Intent;
 import rx.Observable;
 import rx.subjects.AsyncSubject;
 
-class DownloadBroadcastReceiver extends BroadcastReceiver {
+class DownloadReceiver extends BroadcastReceiver {
 
-    private final long downloadId;
     private final AsyncSubject<Long> receivedId;
 
-    DownloadBroadcastReceiver(long downloadId) {
-        this.downloadId = downloadId;
-        this.receivedId = AsyncSubject.create();
+    DownloadReceiver(long downloadId) {
+        receivedId = AsyncSubject.create();
+        receivedId.onNext(downloadId);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        long receivedId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-
-        if (downloadId == receivedId) {
+        long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+        if (Long.valueOf(downloadId).equals(receivedId.getValue())) {
             context.unregisterReceiver(this);
-            this.receivedId.onNext(receivedId);
-            this.receivedId.onCompleted();
+            receivedId.onCompleted();
         }
     }
 

@@ -20,35 +20,35 @@ import android.app.DownloadManager;
 import android.database.Cursor;
 import android.net.Uri;
 
+import rx.Observable;
 import rx.functions.Func1;
 
-class DownloadIdToUri implements Func1<Long, Uri> {
+class IdToDownloadUri implements Func1<Long, Observable<Uri>> {
 
     private final DownloadManager dm;
 
-    DownloadIdToUri(DownloadManager dm) {
+    IdToDownloadUri(DownloadManager dm) {
         this.dm = dm;
     }
 
     @Override
-    public Uri call(Long id) {
-        DownloadManager.Query query = new DownloadManager.Query();
-        query.setFilterById(id);
-
-        Cursor cur = dm.query(query);
+    public Observable<Uri> call(Long id) {
+        Cursor cur = dm.query(new DownloadManager.Query().setFilterById(id));
         try {
             if (!cur.moveToFirst()) {
-                throw new DownloadFailed(id.toString());
+                return Observable.error(new DownloadFailed(String.valueOf(id)));
             }
 
-            int statusColumn = cur.getColumnIndex(DownloadManager.COLUMN_STATUS);
-            if (cur.getInt(statusColumn) != DownloadManager.STATUS_SUCCESSFUL) {
-                int titleColumn = cur.getColumnIndex(DownloadManager.COLUMN_TITLE);
-                throw new DownloadFailed(cur.getString(titleColumn));
+            switch (cur.getInt(cur.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
+                case DownloadManager.STATUS_FAILED:
+                    int titleColumn = cur.getColumnIndex(DownloadManager.COLUMN_TITLE);
+                    return Observable.error(new DownloadFailed(cur.getString(titleColumn)));
+                case DownloadManager.STATUS_SUCCESSFUL:
+                    int localUriColumn = cur.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
+                    return Observable.just(Uri.parse(cur.getString(localUriColumn)));
+                default:
+                    return Observable.empty();
             }
-
-            int localUriColumn = cur.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
-            return Uri.parse(cur.getString(localUriColumn));
         } finally {
             cur.close();
         }

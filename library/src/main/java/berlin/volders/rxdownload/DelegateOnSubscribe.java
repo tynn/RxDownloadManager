@@ -16,32 +16,23 @@
 
 package berlin.volders.rxdownload;
 
-import android.app.DownloadManager;
 import android.net.Uri;
 
-class DownloadManagerRequestFake extends DownloadManager.Request {
+import java.util.concurrent.atomic.AtomicReference;
 
-    DownloadManagerRequestFake(Uri uri) {
-        super(uri);
+import rx.Single;
+import rx.SingleSubscriber;
+
+class DelegateOnSubscribe implements Single.OnSubscribe<Uri> {
+
+    private final AtomicReference<Single<Uri>> source;
+
+    DelegateOnSubscribe(AtomicReference<Single<Uri>> source) {
+        this.source = source;
     }
 
     @Override
-    public DownloadManager.Request setTitle(CharSequence title) {
-        return this;
-    }
-
-    @Override
-    public DownloadManager.Request setDescription(CharSequence description) {
-        return this;
-    }
-
-    @Override
-    public DownloadManager.Request setDestinationInExternalPublicDir(String dirType, String subPath) {
-        return this;
-    }
-
-    @Override
-    public DownloadManager.Request setNotificationVisibility(int visibility) {
-        return this;
+    public void call(SingleSubscriber<? super Uri> singleSubscriber) {
+        source.get().subscribe(singleSubscriber);
     }
 }

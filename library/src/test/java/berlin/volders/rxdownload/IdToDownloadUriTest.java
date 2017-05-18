@@ -30,45 +30,43 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DownloadIdToUri.class, Uri.class})
+@PrepareForTest({IdToDownloadUri.class, Uri.class})
 @PowerMockRunnerDelegate(MockitoJUnitRunner.class)
-public class DownloadIdToUriTest {
+public class IdToDownloadUriTest {
 
     @Mock
     DownloadManager dm;
     @Mock
     Cursor cursor;
 
-    DownloadIdToUri func;
+    IdToDownloadUri func;
 
     @Before
     public void setup() {
-        func = new DownloadIdToUri(dm);
+        func = new IdToDownloadUri(dm);
     }
 
-    @Test(expected = DownloadFailed.class)
+    @Test
     public void call_emptyCursor() throws Exception {
         when(cursor.moveToFirst()).thenReturn(false);
         when(dm.query((DownloadManager.Query) any())).thenReturn(cursor);
 
-        func.call(1L);
+        func.call(1L).test().assertError(DownloadFailed.class);
     }
 
-    @Test(expected = DownloadFailed.class)
+    @Test
     public void call_downloadStatus_notSuccessful() throws Exception {
         when(cursor.moveToFirst()).thenReturn(true);
         when(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)).thenReturn(15);
         when(cursor.getInt(15)).thenReturn(DownloadManager.STATUS_FAILED);
         when(dm.query((DownloadManager.Query) any())).thenReturn(cursor);
 
-        func.call(1L);
+        func.call(1L).test().assertError(DownloadFailed.class);
     }
 
     @Test
@@ -82,6 +80,6 @@ public class DownloadIdToUriTest {
         mockStatic(Uri.class);
         PowerMockito.when(Uri.parse("file")).thenReturn(Uri.EMPTY);
 
-        assertThat(func.call(1L), is(Uri.EMPTY));
+        func.call(1L).test().assertValue(Uri.EMPTY);
     }
 }

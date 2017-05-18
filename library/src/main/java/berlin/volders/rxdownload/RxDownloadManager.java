@@ -18,7 +18,6 @@ package berlin.volders.rxdownload;
 
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -33,15 +32,13 @@ import rx.Single;
  * A reference to the {@code RxDownloadManager} has to be initialised by passing {@link Context}.
  * Then the manager can be directly used by supplying a {@link Uri}, {@link String} file name
  * and a string resource with a description passed to the {@code download} method.
- *
+ * <p>
  * <pre>
  *     rxDownloadManager.download(remoteFileUri, fileName, R.string.description)
  *                      .subscribe(this::useLocalFileUri, this::handleError);
  * </pre>
  */
 public class RxDownloadManager {
-
-    private final IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
 
     final WeakReference<Context> context;
     final DownloadManager dm;
@@ -62,12 +59,20 @@ public class RxDownloadManager {
     }
 
     /**
+     * @param download {@link Download} to bind to a {@link Context}
+     * @return {@code download} bound to a {@link Context}
+     */
+    public Download bind(Download download) {
+        return download.bind(context.get(), dm);
+    }
+
+    /**
      * @param uri         {@link Uri} for downloading the file
      * @param fileName    Destination file name
      * @param description String resource for the text to be shown in the notification associated with the download
      * @return {@link Single} that, upon download completion, will emit the {@link Uri} pointing to the local file
      */
-    public Single<Uri> download(Uri uri, String fileName, @StringRes int description) {
+    public Download download(Uri uri, String fileName, @StringRes int description) {
         return download(request(uri, fileName, description));
     }
 
@@ -75,10 +80,8 @@ public class RxDownloadManager {
      * @param request {@link DownloadManager.Request} that contains the file destination and URL information for downloading
      * @return {@link Single} that, upon download completion, will emit the {@link Uri} pointing to the local file
      */
-    public Single<Uri> download(DownloadManager.Request request) {
-        DownloadBroadcastReceiver receiver = new DownloadBroadcastReceiver(dm.enqueue(request));
-        context.get().registerReceiver(receiver, intentFilter);
-        return receiver.getDownloadId().map(new DownloadIdToUri(dm)).toSingle();
+    public Download download(DownloadManager.Request request) {
+        return bind(new Download(dm.enqueue(request)));
     }
 
     /**
