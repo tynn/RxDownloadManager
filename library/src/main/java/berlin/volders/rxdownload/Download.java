@@ -24,6 +24,7 @@ import android.os.Parcelable;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import rx.Observable;
 import rx.Single;
 
 /**
@@ -56,7 +57,7 @@ public class Download extends Single<Uri> implements Parcelable {
 
     Download bind(Context context, DownloadManager dm) {
         DownloadReceiver receiver = new DownloadReceiver(id);
-        Single<Uri> delegate = receiver.getDownloadId()
+        Single<Uri> delegate = Observable.defer(receiver)
                 .lift(new ReceiverRegistry(context, receiver))
                 .startWith(id)
                 .concatMapEager(new IdToDownloadUri(dm))

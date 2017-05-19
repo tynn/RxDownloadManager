@@ -20,29 +20,41 @@ import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func0;
 import rx.subjects.AsyncSubject;
 
-class DownloadReceiver extends BroadcastReceiver {
+class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Long>> {
 
+    private final long downloadId;
     private final AsyncSubject<Long> receivedId;
 
     DownloadReceiver(long downloadId) {
-        receivedId = AsyncSubject.create();
-        receivedId.onNext(downloadId);
+        this.downloadId = downloadId;
+        this.receivedId = AsyncSubject.create();
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-        if (Long.valueOf(downloadId).equals(receivedId.getValue())) {
+        if (downloadId == intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)) {
             context.unregisterReceiver(this);
+            receivedId.onNext(downloadId);
             receivedId.onCompleted();
         }
     }
 
-    Observable<Long> getDownloadId() {
-        return receivedId;
+    @Override
+    public Observable<Long> call() {
+        Looper me = Looper.myLooper();
+        if (me == null) {
+            return Observable.from(receivedId.toBlocking().toFuture());
+        }
+        if (me == Looper.getMainLooper()) {
+            return receivedId.asObservable();
+        }
+        return receivedId.observeOn(AndroidSchedulers.from(me));
     }
 }
