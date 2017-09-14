@@ -33,7 +33,7 @@ dependencies {
     compile "io.reactivex:rxjava:$rxJavaVersion"
     compile "io.reactivex:rxandroid:$rxAndroidVersion"
     compile 'io.reactivex:rxkotlin:1.0.0'
-    compile 'berlin.volders:indicators:0.2'
+    compile 'com.github.v2rc:indicators:0.2'
     compile 'com.github.barteksc:android-pdf-viewer:2.5.1'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
 

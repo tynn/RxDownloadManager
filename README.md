@@ -4,7 +4,7 @@ RxDownloadManager
 [![Release][3]][4]
 
 *RxDownloadManager* is an implementation wrapping around the Android
-`DownloadManager`, using Rx to expose a `Single`. This allows the user 
+`DownloadManager`, using Rx1 to expose a `Single`. This allows the user 
 to handle download completion and error events.
 
 
@@ -40,7 +40,7 @@ Installation
 Add [JitPack][4] to your repositories and *RxDownloadManager* to your dependencies
 
     dependencies {
-        compile "berlin.volders:rxDownloadManager:$rxDownloadManagerVersion"
+        compile "com.github.v2rc:rxdownloadmanager:$rxDownloadManagerVersion"
     }
 
 
@@ -62,7 +62,7 @@ License
     limitations under the License.
 
 
-  [1]: https://travis-ci.org/volders/RxDownloadManager.svg?branch=master
-  [2]: https://travis-ci.org/volders/RxDownloadManager
-  [3]: https://jitpack.io/v/berlin.volders/rxDownloadManager.svg
-  [4]: https://jitpack.io/#berlin.volders/rxDownloadManager
+  [1]: https://travis-ci.org/v2rc/RxDownloadManager.svg?branch=1.x
+  [2]: https://travis-ci.org/v2rc/RxDownloadManager
+  [3]: https://jitpack.io/v/v2rc/rxdownloadmanager.svg
+  [4]: https://jitpack.io/#v2rc/rxdownloadmanager
