@@ -27,7 +27,7 @@ class InternalPdfFragment : PageFragment("rxdm-internal.pdf") {
 
     override val stubViewLayout = R.layout.fragment_internal_pdf
     override val uri: Uri by lazy {
-        parse(getString(R.string.pdf_download_url))
+        parse(getString(R.string.url_pdf))
     }
 
     override fun onDownloadCompleted(uri: Uri) {

@@ -27,6 +27,6 @@ import android.content.Context;
 public class DownloadUnbound extends IllegalStateException {
 
     DownloadUnbound() {
-        super("RxDownloadManager#bind(Downlaod) was not called.");
+        super("RxDownloadManager#bind(Download) was not called.");
     }
 }

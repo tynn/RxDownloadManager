@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">RxDM Example</string>
-    <string name="button_label">Download</string>
-    <string name="download_description">File downloading…</string>
+
+    <string name="action_downloads">Downloads</string>
+
+    <string name="description_download">File downloading…</string>
+
+    <string name="label_button">Download</string>
+    <string name="label_no_app">PDF application not found</string>
     <string name="label_pdf">Click to download pdf and read it!</string>
 
-    <string name="pdf_download_url" translatable="false">https://static.googleusercontent.com/media/www.google.com/en//intl/en/policies/privacy/google_privacy_policy_en.pdf</string>
-    <string name="image_url" translatable="false">https://68.media.tumblr.com/e5623fd6bfecf645471e1355fade31b2/tumblr_oelepg4OHJ1rxm4e7o1_1280.jpg</string>
-
-    <string name="action_goto_downloads">Downloads</string>
+    <string name="url_pdf" translatable="false">https://static.googleusercontent.com/media/www.google.com/en//intl/en/policies/privacy/google_privacy_policy_en.pdf</string>
+    <string name="url_image" translatable="false">https://68.media.tumblr.com/e5623fd6bfecf645471e1355fade31b2/tumblr_oelepg4OHJ1rxm4e7o1_1280.jpg</string>
 </resources>

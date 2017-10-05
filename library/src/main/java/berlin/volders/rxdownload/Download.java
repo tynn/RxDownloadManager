@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2018 José Pablo Álvarez Lacasia
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,8 +25,9 @@ import android.os.Parcelable;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
 
 /**
  * {@link Parcelable} and observable {@link Single} representation of a download.
@@ -49,7 +51,6 @@ public class Download extends Single<Uri> implements Parcelable {
     }
 
     private Download(long downloadId, AtomicReference<Single<Uri>> delegate) {
-        super(new DelegateOnSubscribe(delegate));
         this.delegate = delegate;
         this.id = downloadId;
         this.source = delegate.get();
@@ -61,8 +62,7 @@ public class Download extends Single<Uri> implements Parcelable {
                 .lift(new ReceiverRegistry(context, receiver))
                 .startWith(id)
                 .concatMapEager(new IdToDownloadUri(dm))
-                .first()
-                .toSingle();
+                .singleOrError();
 
         this.delegate.compareAndSet(source, delegate);
         return this;
@@ -89,4 +89,9 @@ public class Download extends Single<Uri> implements Parcelable {
             return new Download[size];
         }
     };
+
+    @Override
+    protected void subscribeActual(SingleObserver<? super Uri> observer) {
+        delegate.get().subscribe(observer);
+    }
 }

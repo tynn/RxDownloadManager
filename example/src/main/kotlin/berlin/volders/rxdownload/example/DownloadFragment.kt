@@ -24,9 +24,9 @@ import androidx.fragment.app.Fragment
 import berlin.volders.rxdownload.Download
 import berlin.volders.rxdownload.RxDownloadManager
 import berlin.volders.rxdownload.RxDownloadManager.from
-import rx.android.schedulers.AndroidSchedulers.mainThread
-import rx.schedulers.Schedulers.io
-import rx.subscriptions.CompositeSubscription
+import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers.io
 
 abstract class DownloadFragment(private val key: String) : Fragment() {
 
@@ -36,28 +36,28 @@ abstract class DownloadFragment(private val key: String) : Fragment() {
 
     protected val dm: RxDownloadManager by lazy { from(context!!) }
 
-    private val subscriptions = CompositeSubscription()
+    private val subscriptions = CompositeDisposable()
 
     private inline var Bundle.download: Download?
         get() = getParcelable(key)
         set(d) = if (d == null) remove(key) else putParcelable(key, d)
 
     private fun Download.start() {
-        arguments!!.download = dm.bind(this)
+        arguments?.download = dm.bind(this)
         subscriptions.add(
             this
                 .subscribeOn(io())
                 .observeOn(mainThread())
-                .subscribe(this@DownloadFragment::onDownloadCompleted)
+                .subscribe(::onDownloadCompleted)
         )
     }
 
     fun download(request: DownloadManager.Request) =
-        (arguments!!.download ?: dm.download(request)).start()
+        (arguments?.download ?: dm.download(request)).start()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        arguments!!.download?.start()
+        arguments?.download?.start()
     }
 
     override fun onDetach() {

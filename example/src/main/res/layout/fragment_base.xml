@@ -21,5 +21,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:text="@string/button_label" />
+        android:text="@string/label_button" />
 </FrameLayout>

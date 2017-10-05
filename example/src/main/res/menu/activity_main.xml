@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_downloads"
-        android:title="@string/action_goto_downloads"
+        android:title="@string/action_downloads"
         app:showAsAction="always"
         android:icon="@drawable/ic_action_downloads" />
 </menu>

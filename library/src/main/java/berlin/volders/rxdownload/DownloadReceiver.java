@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2018 José Pablo Álvarez Lacasia
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,15 +23,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Looper;
 
-import rx.Observable;
-import rx.functions.Func0;
-import rx.subjects.AsyncSubject;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.AsyncSubject;
+
+import static android.os.Looper.getMainLooper;
 import static android.os.Looper.myLooper;
-import static rx.android.schedulers.AndroidSchedulers.from;
-import static rx.subjects.AsyncSubject.create;
+import static io.reactivex.Observable.fromFuture;
+import static io.reactivex.android.schedulers.AndroidSchedulers.from;
+import static io.reactivex.subjects.AsyncSubject.create;
 
-class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Long>> {
+class DownloadReceiver extends BroadcastReceiver implements Callable<Observable<Long>> {
 
     private final long downloadId;
     private final AsyncSubject<Long> receivedId;
@@ -45,7 +49,7 @@ class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Lon
         if (downloadId == intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)) {
             context.unregisterReceiver(this);
             receivedId.onNext(downloadId);
-            receivedId.onCompleted();
+            receivedId.onComplete();
         }
     }
 
@@ -53,10 +57,10 @@ class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Lon
     public Observable<Long> call() {
         Looper me = myLooper();
         if (me == null) {
-            return Observable.from(receivedId.toBlocking().toFuture());
+            return fromFuture(receivedId.toFuture());
         }
-        if (me == Looper.getMainLooper()) {
-            return receivedId.asObservable();
+        if (me == getMainLooper()) {
+            return receivedId;
         }
         return receivedId.observeOn(from(me));
     }

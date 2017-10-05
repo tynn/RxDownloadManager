@@ -45,7 +45,7 @@ abstract class PageFragment(protected val fileName: String) : DownloadFragment("
 
     private fun buttonClicked() {
         progressBar.visibility = VISIBLE
-        download(dm.request(uri, fileName, R.string.download_description))
+        download(dm.request(uri, fileName, R.string.description_download))
     }
 
     protected open fun onPostStubLoad() {}

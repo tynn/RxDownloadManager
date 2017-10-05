@@ -22,11 +22,13 @@ import android.content.IntentFilter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
+import io.reactivex.ObservableOperator;
+import io.reactivex.Observer;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
-class ReceiverRegistry implements Observable.Operator<Long, Long>, Subscription {
+
+class ReceiverRegistry implements ObservableOperator<Long, Long>, Disposable {
 
     private static final IntentFilter DOWNLOAD_COMPLETE
             = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
@@ -34,17 +36,29 @@ class ReceiverRegistry implements Observable.Operator<Long, Long>, Subscription 
     private final Context context;
     private final DownloadReceiver receiver;
     private final AtomicInteger subscriptions;
+    private final CompositeDisposable disposables;
 
     ReceiverRegistry(Context context, DownloadReceiver receiver) {
         this.context = context;
         this.receiver = receiver;
         this.subscriptions = new AtomicInteger(0);
+        disposables = new CompositeDisposable();
     }
 
     @Override
-    public void unsubscribe() {
-        if (!isUnsubscribed() && subscriptions.decrementAndGet() == 0) {
+    public Observer<? super Long> apply(Observer<? super Long> observer) {
+        if (subscriptions.getAndIncrement() == 0) {
+            context.registerReceiver(receiver, DOWNLOAD_COMPLETE);
+        }
+        disposables.add(this);
+        return observer;
+    }
+
+    @Override
+    public void dispose() {
+        if (!isDisposed() && subscriptions.decrementAndGet() == 0) {
             try {
+                disposables.clear();
                 context.unregisterReceiver(receiver);
             } catch (IllegalArgumentException e) {
                 // broadcast receiver was unregistered before
@@ -53,16 +67,7 @@ class ReceiverRegistry implements Observable.Operator<Long, Long>, Subscription 
     }
 
     @Override
-    public boolean isUnsubscribed() {
+    public boolean isDisposed() {
         return subscriptions.get() == 0;
-    }
-
-    @Override
-    public Subscriber<? super Long> call(Subscriber<? super Long> subscriber) {
-        if (subscriptions.getAndIncrement() == 0) {
-            context.registerReceiver(receiver, DOWNLOAD_COMPLETE);
-        }
-        subscriber.add(this);
-        return subscriber;
     }
 }

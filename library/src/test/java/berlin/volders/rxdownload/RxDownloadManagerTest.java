@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2019 Christian Schmitz
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

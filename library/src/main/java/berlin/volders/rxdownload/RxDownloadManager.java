@@ -28,7 +28,7 @@ import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
 
-import rx.Single;
+import io.reactivex.Single;
 
 import static android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
 import static android.content.Context.DOWNLOAD_SERVICE;
