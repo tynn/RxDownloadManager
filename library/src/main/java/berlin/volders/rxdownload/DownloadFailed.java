@@ -21,6 +21,7 @@ package berlin.volders.rxdownload;
  * of the enqueued download or if the download completes with a status other than
  * {@link android.app.DownloadManager#STATUS_SUCCESSFUL}
  */
+@SuppressWarnings("WeakerAccess")
 public class DownloadFailed extends IllegalStateException {
 
     DownloadFailed(String msg) {

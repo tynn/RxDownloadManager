@@ -20,43 +20,44 @@ import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import berlin.volders.rxdownload.Download
 import berlin.volders.rxdownload.RxDownloadManager
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import berlin.volders.rxdownload.RxDownloadManager.from
+import rx.android.schedulers.AndroidSchedulers.mainThread
+import rx.schedulers.Schedulers.io
 import rx.subscriptions.CompositeSubscription
 
-abstract class DownloadFragment(val key: String) : Fragment() {
+abstract class DownloadFragment(private val key: String) : Fragment() {
 
     init {
         arguments = Bundle()
     }
 
-    val dm: RxDownloadManager by lazy {
-        RxDownloadManager.from(context)
-    }
+    protected val dm: RxDownloadManager by lazy { from(context!!) }
 
-    val subscriptions: CompositeSubscription = CompositeSubscription()
+    private val subscriptions = CompositeSubscription()
 
-    var Bundle.download: Download?
+    private inline var Bundle.download: Download?
         get() = getParcelable(key)
         set(d) = if (d == null) remove(key) else putParcelable(key, d)
 
-    fun Download.start() {
-        arguments.download = dm.bind(this)
-        subscriptions.add(this
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this@DownloadFragment::onDownloadCompleted))
+    private fun Download.start() {
+        arguments!!.download = dm.bind(this)
+        subscriptions.add(
+            this
+                .subscribeOn(io())
+                .observeOn(mainThread())
+                .subscribe(this@DownloadFragment::onDownloadCompleted)
+        )
     }
 
     fun download(request: DownloadManager.Request) =
-            (arguments.download ?: dm.download(request)).start()
+        (arguments!!.download ?: dm.download(request)).start()
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
-        arguments.download?.start()
+        arguments!!.download?.start()
     }
 
     override fun onDetach() {

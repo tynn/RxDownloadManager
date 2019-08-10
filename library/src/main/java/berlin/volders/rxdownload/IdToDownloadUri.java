@@ -23,6 +23,16 @@ import android.net.Uri;
 import rx.Observable;
 import rx.functions.Func1;
 
+import static android.app.DownloadManager.COLUMN_LOCAL_URI;
+import static android.app.DownloadManager.COLUMN_STATUS;
+import static android.app.DownloadManager.COLUMN_TITLE;
+import static android.app.DownloadManager.Query;
+import static android.app.DownloadManager.STATUS_FAILED;
+import static android.app.DownloadManager.STATUS_SUCCESSFUL;
+import static rx.Observable.empty;
+import static rx.Observable.error;
+import static rx.Observable.just;
+
 class IdToDownloadUri implements Func1<Long, Observable<Uri>> {
 
     private final DownloadManager dm;
@@ -32,22 +42,23 @@ class IdToDownloadUri implements Func1<Long, Observable<Uri>> {
     }
 
     @Override
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public Observable<Uri> call(Long id) {
-        Cursor cur = dm.query(new DownloadManager.Query().setFilterById(id));
+        Cursor cur = dm.query(new Query().setFilterById(id));
         try {
             if (!cur.moveToFirst()) {
-                return Observable.error(new DownloadFailed(String.valueOf(id)));
+                return error(new DownloadFailed(String.valueOf(id)));
             }
 
-            switch (cur.getInt(cur.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
-                case DownloadManager.STATUS_FAILED:
-                    int titleColumn = cur.getColumnIndex(DownloadManager.COLUMN_TITLE);
-                    return Observable.error(new DownloadFailed(cur.getString(titleColumn)));
-                case DownloadManager.STATUS_SUCCESSFUL:
-                    int localUriColumn = cur.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
-                    return Observable.just(Uri.parse(cur.getString(localUriColumn)));
+            switch (cur.getInt(cur.getColumnIndex(COLUMN_STATUS))) {
+                case STATUS_FAILED:
+                    int titleColumn = cur.getColumnIndex(COLUMN_TITLE);
+                    return error(new DownloadFailed(cur.getString(titleColumn)));
+                case STATUS_SUCCESSFUL:
+                    int localUriColumn = cur.getColumnIndex(COLUMN_LOCAL_URI);
+                    return just(Uri.parse(cur.getString(localUriColumn)));
                 default:
-                    return Observable.empty();
+                    return empty();
             }
         } finally {
             cur.close();

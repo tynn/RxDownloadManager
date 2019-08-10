@@ -23,9 +23,12 @@ import android.content.Intent;
 import android.os.Looper;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func0;
 import rx.subjects.AsyncSubject;
+
+import static android.os.Looper.myLooper;
+import static rx.android.schedulers.AndroidSchedulers.from;
+import static rx.subjects.AsyncSubject.create;
 
 class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Long>> {
 
@@ -34,7 +37,7 @@ class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Lon
 
     DownloadReceiver(long downloadId) {
         this.downloadId = downloadId;
-        this.receivedId = AsyncSubject.create();
+        this.receivedId = create();
     }
 
     @Override
@@ -48,13 +51,13 @@ class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Lon
 
     @Override
     public Observable<Long> call() {
-        Looper me = Looper.myLooper();
+        Looper me = myLooper();
         if (me == null) {
             return Observable.from(receivedId.toBlocking().toFuture());
         }
         if (me == Looper.getMainLooper()) {
             return receivedId.asObservable();
         }
-        return receivedId.observeOn(AndroidSchedulers.from(me));
+        return receivedId.observeOn(from(me));
     }
 }

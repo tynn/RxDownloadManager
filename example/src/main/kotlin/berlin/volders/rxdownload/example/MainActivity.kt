@@ -16,45 +16,47 @@
 
 package berlin.volders.rxdownload.example
 
-import android.Manifest
-import android.app.DownloadManager
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.app.DownloadManager.ACTION_VIEW_DOWNLOADS
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat.checkSelfPermission
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private val permissions = arrayOf(WRITE_EXTERNAL_STORAGE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         pageIndicators.viewPager = viewPager
 
-        if (ContextCompat.checkSelfPermission(this, permissions[0]) == PERMISSION_GRANTED) {
+        if (checkSelfPermission(this, permissions[0]) == PERMISSION_GRANTED) {
             viewPager.adapter = MainPagerAdapter(supportFragmentManager)
         } else {
-            ActivityCompat.requestPermissions(this, permissions, 1)
+            requestPermissions(this, permissions, 1)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.activity_main, menu)
-        return super.onCreateOptionsMenu(menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
-            if (item.itemId == R.id.action_downloads) {
-                startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)) is Unit
-            } else {
-                super.onOptionsItemSelected(item)
-            }
+        if (item.itemId == R.id.action_downloads) {
+            startActivity(Intent(ACTION_VIEW_DOWNLOADS))
+            true
+        } else {
+            super.onOptionsItemSelected(item)
+        }
 
     override fun onRequestPermissionsResult(code: Int, permissions: Array<out String>, granted: IntArray) {
         if (code == 1 && granted.elementAtOrNull(0) == PERMISSION_GRANTED) {

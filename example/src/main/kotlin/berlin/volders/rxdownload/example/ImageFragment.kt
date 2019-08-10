@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2019 Christian Schmitz
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,36 +18,40 @@
 package berlin.volders.rxdownload.example
 
 import android.net.Uri
-import android.os.Environment
-import android.view.View
+import android.net.Uri.fromFile
+import android.net.Uri.parse
+import android.os.Environment.DIRECTORY_DOWNLOADS
+import android.os.Environment.getExternalStoragePublicDirectory
+import android.view.View.GONE
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_image.*
 import java.io.File
 
 class ImageFragment : PageFragment("rxdm-image.jpg") {
 
-    val String.isFile get() = File(this).exists()
-
-    private val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path + "/" + fileName
-
-    override fun getStubViewLayout() = R.layout.fragment_image
-
-    override fun onDownloadCompleted(uri: Uri) {
-        button.visibility = View.GONE
-        progressBar.visibility = View.GONE
-        photoView.setImageURI(uri)
-        photoView.background = photoView.drawable.constantState.newDrawable()
+    private val file by lazy {
+        File(getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), fileName)
     }
 
-    override fun onPostStubLoad() {
-        if (filePath.isFile) {
-            onDownloadCompleted(getUri())
+    override val stubViewLayout = R.layout.fragment_image
+    override val uri: Uri by lazy {
+        if (file.exists()) {
+            fromFile(file)
+        } else {
+            parse(getString(R.string.image_url))
         }
     }
 
-    override fun getUri() = if (filePath.isFile) {
-        Uri.fromFile(File(filePath))
-    } else {
-        Uri.parse(getString(R.string.image_url))
+    override fun onDownloadCompleted(uri: Uri) {
+        button.visibility = GONE
+        progressBar.visibility = GONE
+        photoView.setImageURI(uri)
+        photoView.background = photoView.drawable?.constantState?.newDrawable()
+    }
+
+    override fun onPostStubLoad() {
+        if (file.exists()) {
+            onDownloadCompleted(uri)
+        }
     }
 }

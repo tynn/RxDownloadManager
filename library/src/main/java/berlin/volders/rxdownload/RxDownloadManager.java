@@ -17,16 +17,22 @@
 package berlin.volders.rxdownload;
 
 import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.annotation.VisibleForTesting;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
 
 import rx.Single;
+
+import static android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+import static android.content.Context.DOWNLOAD_SERVICE;
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 /**
  * A reference to the {@code RxDownloadManager} has to be initialised by passing {@link Context}.
@@ -37,10 +43,14 @@ import rx.Single;
  *     rxDownloadManager.download(remoteFileUri, fileName, R.string.description)
  *                      .subscribe(this::useLocalFileUri, this::handleError);
  * </pre>
+ * </p>
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class RxDownloadManager {
 
+    @VisibleForTesting
     final WeakReference<Context> context;
+    @VisibleForTesting
     final DownloadManager dm;
 
     @VisibleForTesting
@@ -54,7 +64,7 @@ public class RxDownloadManager {
      * @return A new instance of this manager
      */
     public static RxDownloadManager from(@NonNull Context context) {
-        DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager dm = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
         return new RxDownloadManager(context.getApplicationContext(), dm);
     }
 
@@ -77,22 +87,22 @@ public class RxDownloadManager {
     }
 
     /**
-     * @param request {@link DownloadManager.Request} that contains the file destination and URL information for downloading
+     * @param request {@link Request} that contains the file destination and URL information for downloading
      * @return {@link Single} that, upon download completion, will emit the {@link Uri} pointing to the local file
      */
-    public Download download(DownloadManager.Request request) {
+    public Download download(Request request) {
         return bind(new Download(dm.enqueue(request)));
     }
 
     /**
      * @param uri      {@link Uri} for downloading the file
      * @param fileName Destination file name
-     * @return Built {@link DownloadManager.Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
+     * @return Built {@link Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
      */
-    public static DownloadManager.Request request(Uri uri, String fileName) {
-        return new DownloadManager.Request(uri)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+    public static Request request(Uri uri, String fileName) {
+        return new Request(uri)
+                .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, fileName)
                 .setTitle(fileName);
     }
 
@@ -100,9 +110,9 @@ public class RxDownloadManager {
      * @param uri         {@link Uri} for downloading the file
      * @param fileName    Destination file name
      * @param description {@link String} to be shown in the notification associated with the download
-     * @return {@link DownloadManager.Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
+     * @return {@link Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
      */
-    public static DownloadManager.Request request(Uri uri, String fileName, String description) {
+    public static Request request(Uri uri, String fileName, String description) {
         return request(uri, fileName).setDescription(description);
     }
 
@@ -110,9 +120,9 @@ public class RxDownloadManager {
      * @param uri         {@link Uri} for downloading the file
      * @param fileName    Destination file name
      * @param description String resource for the text to be shown in the notification associated with the download
-     * @return {@link DownloadManager.Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
+     * @return {@link Request} with destination folder {@link Environment#DIRECTORY_DOWNLOADS} and file name
      */
-    public DownloadManager.Request request(Uri uri, String fileName, @StringRes int description) {
+    public Request request(Uri uri, String fileName, @StringRes int description) {
         return request(uri, fileName).setDescription(context.get().getString(description));
     }
 }

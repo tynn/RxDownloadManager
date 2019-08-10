@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2019 Christian Schmitz
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,34 +19,34 @@ package berlin.volders.rxdownload.example
 
 import android.net.Uri
 import android.os.Bundle
-import android.support.annotation.LayoutRes
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import kotlinx.android.synthetic.main.fragment_base.*
 
-abstract class PageFragment(val fileName: String) : DownloadFragment("x_" + fileName + "_downlad") {
+abstract class PageFragment(protected val fileName: String) : DownloadFragment("x_" + fileName + "_downlad") {
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, state: Bundle?)
-            = inflater?.inflate(R.layout.fragment_base, container, false)
+    @get:LayoutRes
+    protected abstract val stubViewLayout: Int
+    protected abstract val uri: Uri
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View =
+        inflater.inflate(R.layout.fragment_base, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewStub.layoutResource = getStubViewLayout()
+        viewStub.layoutResource = stubViewLayout
         viewStub.inflate()
         button.setOnClickListener { buttonClicked() }
         onPostStubLoad()
     }
 
     private fun buttonClicked() {
-        progressBar.visibility = View.VISIBLE
-        download(dm.request(getUri(), fileName, R.string.download_description))
+        progressBar.visibility = VISIBLE
+        download(dm.request(uri, fileName, R.string.download_description))
     }
 
-    open fun onPostStubLoad() {}
-
-    @LayoutRes
-    abstract fun getStubViewLayout(): Int
-
-    abstract fun getUri(): Uri
+    protected open fun onPostStubLoad() {}
 }

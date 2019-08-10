@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2019 Christian Schmitz
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +18,24 @@
 package berlin.volders.rxdownload.example
 
 import android.net.Uri
-import android.view.View
+import android.net.Uri.parse
+import android.view.View.GONE
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_internal_pdf.*
 
 class InternalPdfFragment : PageFragment("rxdm-internal.pdf") {
 
-    override fun getStubViewLayout() = R.layout.fragment_internal_pdf
-
-    override fun onDownloadCompleted(uri: Uri) {
-        button.visibility = View.GONE
-        pdfView.fromUri(uri)
-                .onLoad {
-                    textLabel.visibility = View.GONE
-                    progressBar.visibility = View.GONE
-                }.load()
+    override val stubViewLayout = R.layout.fragment_internal_pdf
+    override val uri: Uri by lazy {
+        parse(getString(R.string.pdf_download_url))
     }
 
-    override fun getUri() = Uri.parse(getString(R.string.pdf_download_url))
+    override fun onDownloadCompleted(uri: Uri) {
+        button.visibility = GONE
+        pdfView.fromUri(uri)
+            .onLoad {
+                textLabel.visibility = GONE
+                progressBar.visibility = GONE
+            }.load()
+    }
 }

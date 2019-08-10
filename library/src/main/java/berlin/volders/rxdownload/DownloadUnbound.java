@@ -23,6 +23,7 @@ import android.content.Context;
  *
  * @see RxDownloadManager#bind(Download)
  */
+@SuppressWarnings("WeakerAccess")
 public class DownloadUnbound extends IllegalStateException {
 
     DownloadUnbound() {

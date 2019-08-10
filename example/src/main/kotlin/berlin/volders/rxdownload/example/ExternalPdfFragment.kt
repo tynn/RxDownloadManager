@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2019 Christian Schmitz
  * Copyright (C) 2017 volders GmbH with <3 in Berlin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +17,30 @@
 
 package berlin.volders.rxdownload.example
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.net.Uri
-import android.view.View
+import android.net.Uri.parse
+import android.view.View.GONE
+import androidx.core.content.FileProvider.getUriForFile
 import kotlinx.android.synthetic.main.fragment_base.*
+import java.io.File
 
 class ExternalPdfFragment : PageFragment("rxdm-external.pdf") {
 
-    override fun getStubViewLayout() = R.layout.fragment_external_pdf
+    override val stubViewLayout = R.layout.fragment_external_pdf
+    override val uri: Uri by lazy {
+        parse(getString(R.string.pdf_download_url))
+    }
 
-    override fun getUri() = Uri.parse(getString(R.string.pdf_download_url))
-
-    override fun onDownloadCompleted(uri: Uri) {
-        progressBar.visibility = View.GONE
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, "application/pdf")
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            e.printStackTrace()
-        }
+    override fun onDownloadCompleted(uri: Uri) = with(context!!) {
+        progressBar.visibility = GONE
+        val file = File(uri.path!!)
+        val content = getUriForFile(this, "$packageName.files", file)
+        val intent = Intent(ACTION_VIEW)
+        intent.setDataAndType(content, "application/pdf")
+        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(intent)
     }
 }

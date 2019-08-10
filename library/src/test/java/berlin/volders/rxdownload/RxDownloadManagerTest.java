@@ -17,21 +17,28 @@
 package berlin.volders.rxdownload;
 
 import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Environment;
-import android.support.annotation.StringRes;
+
+import androidx.annotation.StringRes;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
+import berlin.volders.rxdownload.test.EnvironmentRule;
+
+import static android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+import static android.content.Context.DOWNLOAD_SERVICE;
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -43,35 +50,35 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(RxDownloadManager.class)
 @PowerMockRunnerDelegate(MockitoJUnitRunner.class)
 public class RxDownloadManagerTest {
+
+    @Rule
+    public final EnvironmentRule env = new EnvironmentRule();
 
     @Mock
     Context context;
     @Mock
     DownloadManager dm;
     @Mock
-    DownloadManager.Request request;
+    Request request;
     @Mock
     Uri uri;
 
     RxDownloadManager rxDownloadManager;
 
     @Before
-    public void setup() throws Exception {
-        when(context.getApplicationContext()).thenReturn(context);
-        when(context.getSystemService(Context.DOWNLOAD_SERVICE)).thenReturn(dm);
-        when(request.setTitle(any(CharSequence.class))).thenReturn(request);
-        when(request.setDescription(any(CharSequence.class))).thenReturn(request);
-        when(request.setDestinationInExternalPublicDir(anyString(), anyString())).thenReturn(request);
-        when(request.setNotificationVisibility(anyInt())).thenReturn(request);
+    public void setup() {
         rxDownloadManager = new RxDownloadManager(context, dm);
     }
 
     @Test
-    public void from() throws Exception {
+    public void from() {
+        when(context.getApplicationContext()).thenReturn(context);
+        when(context.getSystemService(DOWNLOAD_SERVICE)).thenReturn(dm);
+
         RxDownloadManager rxDownloadManager = RxDownloadManager.from(context);
 
         assertThat(rxDownloadManager, notNullValue());
@@ -80,13 +87,18 @@ public class RxDownloadManagerTest {
     }
 
     @Test
+    @PrepareForTest(RxDownloadManager.class)
     public void download_uri() throws Exception {
         @StringRes int descriptionRes = 123456;
         String fileName = "fileName";
         String description = "description";
-        whenNew(DownloadManager.Request.class).withArguments(uri).thenReturn(request);
         when(context.getString(descriptionRes)).thenReturn(description);
         when(dm.enqueue(request)).thenReturn(1L);
+        when(request.setTitle(any(CharSequence.class))).thenReturn(request);
+        when(request.setDescription(any(CharSequence.class))).thenReturn(request);
+        when(request.setDestinationInExternalPublicDir(anyString(), anyString())).thenReturn(request);
+        when(request.setNotificationVisibility(anyInt())).thenReturn(request);
+        whenNew(Request.class).withAnyArguments().thenReturn(request);
 
         Download download = rxDownloadManager.download(uri, fileName, descriptionRes);
 
@@ -95,17 +107,17 @@ public class RxDownloadManagerTest {
         verify(dm).enqueue(request);
         verify(request).setTitle(fileName);
         verify(request).setDescription(description);
-        verify(request).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-        verify(request).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        verify(request).setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, fileName);
+        verify(request).setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
     }
 
     @Test
-    public void download_request() throws Exception {
-        when(dm.enqueue(request)).thenReturn(1L);
+    public void download_request() {
+        when(dm.enqueue(request)).thenReturn(2L);
 
         Download download = rxDownloadManager.download(request);
 
-        assertThat(download.id, is(1L));
+        assertThat(download.id, is(2L));
         verify(context, never()).registerReceiver(any(DownloadReceiver.class), any(IntentFilter.class));
         verify(dm).enqueue(request);
     }

@@ -25,7 +25,7 @@ The `Single` will then asynchronously emit an `Uri`, pointing to the local file.
 A `DownloadManager.Request` is built automatically and enqueued by the `download()` 
 method. 
 
-Convinience methods returning `DownloadManager.Request` are supplied for
+Convenience methods returning `DownloadManager.Request` are supplied for
 further customization. Downloaded files are stored under `Environment.DIRECTORY_DOWNLOADS`.
 
     request = RxDownloadManager.request(uri, fileName)
@@ -47,6 +47,7 @@ Add [JitPack][4] to your repositories and *RxDownloadManager* to your dependenci
 License
 -------
 
+    Copyright (C) 2019 Christian Schmitz
     Copyright (C) 2017 volders GmbH with <3 in Berlin
 
     Licensed under the Apache License, Version 2.0 (the "License");

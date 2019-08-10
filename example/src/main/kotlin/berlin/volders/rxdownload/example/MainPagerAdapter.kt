@@ -16,12 +16,12 @@
 
 package berlin.volders.rxdownload.example
 
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 
 class MainPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-    val fragments = listOf(ExternalPdfFragment(), ImageFragment(), InternalPdfFragment())
+    private val fragments = listOf(ExternalPdfFragment(), ImageFragment(), InternalPdfFragment())
 
     override fun getItem(position: Int) = fragments[position]
 

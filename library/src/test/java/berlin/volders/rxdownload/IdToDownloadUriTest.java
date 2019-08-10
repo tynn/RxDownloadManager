@@ -24,18 +24,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
+import static android.app.DownloadManager.COLUMN_LOCAL_URI;
+import static android.app.DownloadManager.COLUMN_STATUS;
+import static android.app.DownloadManager.Query;
+import static android.app.DownloadManager.STATUS_FAILED;
+import static android.app.DownloadManager.STATUS_SUCCESSFUL;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+@SuppressWarnings("WeakerAccess")
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({IdToDownloadUri.class, Uri.class})
+@PrepareForTest(IdToDownloadUri.class)
 @PowerMockRunnerDelegate(MockitoJUnitRunner.class)
 public class IdToDownloadUriTest {
 
@@ -43,43 +50,48 @@ public class IdToDownloadUriTest {
     DownloadManager dm;
     @Mock
     Cursor cursor;
+    @Mock
+    Query query;
 
     IdToDownloadUri func;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        whenNew(Query.class).withNoArguments().thenReturn(query);
         func = new IdToDownloadUri(dm);
     }
 
     @Test
-    public void call_emptyCursor() throws Exception {
+    public void call_emptyCursor() {
         when(cursor.moveToFirst()).thenReturn(false);
-        when(dm.query((DownloadManager.Query) any())).thenReturn(cursor);
+        when(dm.query((Query) any())).thenReturn(cursor);
 
         func.call(1L).test().assertError(DownloadFailed.class);
     }
 
     @Test
-    public void call_downloadStatus_notSuccessful() throws Exception {
+    public void call_downloadStatus_notSuccessful() {
         when(cursor.moveToFirst()).thenReturn(true);
-        when(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)).thenReturn(15);
-        when(cursor.getInt(15)).thenReturn(DownloadManager.STATUS_FAILED);
-        when(dm.query((DownloadManager.Query) any())).thenReturn(cursor);
+        when(cursor.getColumnIndex(COLUMN_STATUS)).thenReturn(15);
+        when(cursor.getInt(15)).thenReturn(STATUS_FAILED);
+        when(dm.query((Query) any())).thenReturn(cursor);
 
         func.call(1L).test().assertError(DownloadFailed.class);
     }
 
     @Test
-    public void call_downloadSuccess() throws Exception {
+    @PrepareForTest({IdToDownloadUri.class, Uri.class})
+    public void call_downloadSuccess() {
+        Uri uri = mock(Uri.class);
+        PowerMockito.mockStatic(Uri.class);
+        PowerMockito.when(Uri.parse("file")).thenReturn(uri);
         when(cursor.moveToFirst()).thenReturn(true);
-        when(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)).thenReturn(15);
-        when(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)).thenReturn(16);
-        when(cursor.getInt(15)).thenReturn(DownloadManager.STATUS_SUCCESSFUL);
+        when(cursor.getColumnIndex(COLUMN_STATUS)).thenReturn(15);
+        when(cursor.getColumnIndex(COLUMN_LOCAL_URI)).thenReturn(16);
+        when(cursor.getInt(15)).thenReturn(STATUS_SUCCESSFUL);
         when(cursor.getString(16)).thenReturn("file");
-        when(dm.query((DownloadManager.Query) any())).thenReturn(cursor);
-        mockStatic(Uri.class);
-        PowerMockito.when(Uri.parse("file")).thenReturn(Uri.EMPTY);
+        when(dm.query((Query) any())).thenReturn(cursor);
 
-        func.call(1L).test().assertValue(Uri.EMPTY);
+        func.call(1L).test().assertValue(uri);
     }
 }
