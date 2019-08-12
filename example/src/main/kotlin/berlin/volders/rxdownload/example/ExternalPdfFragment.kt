@@ -17,12 +17,16 @@
 
 package berlin.volders.rxdownload.example
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.net.Uri
 import android.net.Uri.parse
+import android.util.Log.w
 import android.view.View.GONE
+import android.widget.Toast.LENGTH_LONG
+import android.widget.Toast.makeText
 import androidx.core.content.FileProvider.getUriForFile
 import kotlinx.android.synthetic.main.fragment_base.*
 import java.io.File
@@ -31,16 +35,22 @@ class ExternalPdfFragment : PageFragment("rxdm-external.pdf") {
 
     override val stubViewLayout = R.layout.fragment_external_pdf
     override val uri: Uri by lazy {
-        parse(getString(R.string.pdf_download_url))
+        parse(getString(R.string.url_pdf))
     }
 
     override fun onDownloadCompleted(uri: Uri) = with(context!!) {
         progressBar.visibility = GONE
+        val authority = "$packageName.files"
         val file = File(uri.path!!)
-        val content = getUriForFile(this, "$packageName.files", file)
+        val content = getUriForFile(this, authority, file)
         val intent = Intent(ACTION_VIEW)
         intent.setDataAndType(content, "application/pdf")
         intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(intent)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            w("ExternalPdfFragment", e)
+            makeText(this, R.string.label_no_app, LENGTH_LONG).show()
+        }
     }
 }

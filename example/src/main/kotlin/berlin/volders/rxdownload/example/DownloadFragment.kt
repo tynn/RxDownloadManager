@@ -43,21 +43,21 @@ abstract class DownloadFragment(private val key: String) : Fragment() {
         set(d) = if (d == null) remove(key) else putParcelable(key, d)
 
     private fun Download.start() {
-        arguments!!.download = dm.bind(this)
+        arguments?.download = dm.bind(this)
         subscriptions.add(
             this
                 .subscribeOn(io())
                 .observeOn(mainThread())
-                .subscribe(this@DownloadFragment::onDownloadCompleted)
+                .subscribe(::onDownloadCompleted)
         )
     }
 
     fun download(request: DownloadManager.Request) =
-        (arguments!!.download ?: dm.download(request)).start()
+        (arguments?.download ?: dm.download(request)).start()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        arguments!!.download?.start()
+        arguments?.download?.start()
     }
 
     override fun onDetach() {

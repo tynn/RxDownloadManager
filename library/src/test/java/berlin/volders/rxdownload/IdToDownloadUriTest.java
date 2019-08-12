@@ -37,6 +37,7 @@ import static android.app.DownloadManager.STATUS_FAILED;
 import static android.app.DownloadManager.STATUS_SUCCESSFUL;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -67,6 +68,8 @@ public class IdToDownloadUriTest {
         when(dm.query((Query) any())).thenReturn(cursor);
 
         func.call(1L).test().assertError(DownloadFailed.class);
+
+        verify(query).setFilterById(1L);
     }
 
     @Test
@@ -76,7 +79,9 @@ public class IdToDownloadUriTest {
         when(cursor.getInt(15)).thenReturn(STATUS_FAILED);
         when(dm.query((Query) any())).thenReturn(cursor);
 
-        func.call(1L).test().assertError(DownloadFailed.class);
+        func.call(2L).test().assertError(DownloadFailed.class);
+
+        verify(query).setFilterById(2L);
     }
 
     @Test
@@ -92,6 +97,8 @@ public class IdToDownloadUriTest {
         when(cursor.getString(16)).thenReturn("file");
         when(dm.query((Query) any())).thenReturn(cursor);
 
-        func.call(1L).test().assertValue(uri);
+        func.call(3L).test().assertValue(uri);
+
+        verify(query).setFilterById(3L);
     }
 }

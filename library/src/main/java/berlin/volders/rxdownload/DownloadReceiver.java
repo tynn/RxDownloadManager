@@ -26,6 +26,7 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.subjects.AsyncSubject;
 
+import static android.os.Looper.getMainLooper;
 import static android.os.Looper.myLooper;
 import static rx.android.schedulers.AndroidSchedulers.from;
 import static rx.subjects.AsyncSubject.create;
@@ -55,7 +56,7 @@ class DownloadReceiver extends BroadcastReceiver implements Func0<Observable<Lon
         if (me == null) {
             return Observable.from(receivedId.toBlocking().toFuture());
         }
-        if (me == Looper.getMainLooper()) {
+        if (me == getMainLooper()) {
             return receivedId.asObservable();
         }
         return receivedId.observeOn(from(me));

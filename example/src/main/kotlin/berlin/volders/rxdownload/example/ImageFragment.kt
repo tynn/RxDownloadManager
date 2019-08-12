@@ -21,7 +21,6 @@ import android.net.Uri
 import android.net.Uri.fromFile
 import android.net.Uri.parse
 import android.os.Environment.DIRECTORY_DOWNLOADS
-import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View.GONE
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_image.*
@@ -30,7 +29,7 @@ import java.io.File
 class ImageFragment : PageFragment("rxdm-image.jpg") {
 
     private val file by lazy {
-        File(getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), fileName)
+        File(context!!.getExternalFilesDir(DIRECTORY_DOWNLOADS), fileName)
     }
 
     override val stubViewLayout = R.layout.fragment_image
@@ -38,7 +37,7 @@ class ImageFragment : PageFragment("rxdm-image.jpg") {
         if (file.exists()) {
             fromFile(file)
         } else {
-            parse(getString(R.string.image_url))
+            parse(getString(R.string.url_image))
         }
     }
 

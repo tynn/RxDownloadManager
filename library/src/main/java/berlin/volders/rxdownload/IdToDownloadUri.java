@@ -29,6 +29,8 @@ import static android.app.DownloadManager.COLUMN_TITLE;
 import static android.app.DownloadManager.Query;
 import static android.app.DownloadManager.STATUS_FAILED;
 import static android.app.DownloadManager.STATUS_SUCCESSFUL;
+import static android.net.Uri.parse;
+import static java.lang.String.valueOf;
 import static rx.Observable.empty;
 import static rx.Observable.error;
 import static rx.Observable.just;
@@ -47,7 +49,7 @@ class IdToDownloadUri implements Func1<Long, Observable<Uri>> {
         Cursor cur = dm.query(new Query().setFilterById(id));
         try {
             if (!cur.moveToFirst()) {
-                return error(new DownloadFailed(String.valueOf(id)));
+                return error(new DownloadFailed(valueOf(id)));
             }
 
             switch (cur.getInt(cur.getColumnIndex(COLUMN_STATUS))) {
@@ -56,7 +58,7 @@ class IdToDownloadUri implements Func1<Long, Observable<Uri>> {
                     return error(new DownloadFailed(cur.getString(titleColumn)));
                 case STATUS_SUCCESSFUL:
                     int localUriColumn = cur.getColumnIndex(COLUMN_LOCAL_URI);
-                    return just(Uri.parse(cur.getString(localUriColumn)));
+                    return just(parse(cur.getString(localUriColumn)));
                 default:
                     return empty();
             }

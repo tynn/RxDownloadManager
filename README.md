@@ -2,6 +2,7 @@ RxDownloadManager
 =================
 [![Build][1]][2]
 [![Release][3]][4]
+[![Versions][7]][8]
 
 *RxDownloadManager* is an implementation wrapping around the Android
 `DownloadManager`, using Rx1 to expose a `Single`. This allows the user 
@@ -63,7 +64,9 @@ License
     limitations under the License.
 
 
-  [1]: https://travis-ci.org/v2rc/RxDownloadManager.svg?branch=1.x
+  [1]: https://travis-ci.org/v2rc/RxDownloadManager.svg?branch=legacy
   [2]: https://travis-ci.org/v2rc/RxDownloadManager
   [3]: https://jitpack.io/v/v2rc/rxdownloadmanager.svg
   [4]: https://jitpack.io/#v2rc/rxdownloadmanager
+  [7]: https://asapi.herokuapp.com/com.github.v2rc/rxdownloadmanager/1.+@svg
+  [8]: https://asapi.herokuapp.com/com.github.v2rc/rxdownloadmanager/1.+
